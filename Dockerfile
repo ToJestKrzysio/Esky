@@ -13,7 +13,8 @@ RUN apk update \
     && python -m pip install --upgrade pip \
     && pip install --no-cache-dir pipenv \
     && pipenv install --system \
-    && apk del --no-cache .build-deps
+    && apk del --no-cache .build-deps \
+    && mkdir -p ./docs/Flake8/
 
 COPY . ./
 
