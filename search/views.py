@@ -1,5 +1,5 @@
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views import generic
 
 from . import forms
@@ -7,7 +7,6 @@ from . import forms
 
 class SearchView(generic.TemplateView):
     template_name = 'search/search.html'
-    success_url = reverse_lazy('search:results')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -21,11 +20,27 @@ class SearchView(generic.TemplateView):
     def get(self, request, *args, **kwargs):
         form = forms.SearchForm(request.GET)
         if form.is_valid():
-            return redirect('search:results')
+            return redirect(reverse('search:flights') + request.get_full_path()[1:])
         return super().get(request, *args, **kwargs)
 
 
-class ResultsView(generic.FormView):
+class ResultsView(generic.TemplateView):
     form_class = forms.SearchForm
-    template_name = 'search/results.html'
-    success_url = reverse_lazy('search:results')
+    template_name = 'search/flights.html'
+
+    def get(self, request, *args, **kwargs):
+        form = forms.SearchForm(request.GET)
+        print(request.get_full_path()[1:])
+        if request.GET:
+
+        # GET DATA
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET:
+            form = forms.SearchForm(self.request.GET)
+        else:
+            form = forms.SearchForm()
+        context["form"] = form
+        return context
