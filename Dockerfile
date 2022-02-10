@@ -1,4 +1,4 @@
-FROM python:3.10.2-alpine AS build
+FROM python:3.10.2 AS build
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -8,12 +8,9 @@ WORKDIR $APP_CODE
 
 COPY Pipfile Pipfile.lock ./
 
-RUN apk update \
-    && apk add --no-cache --update --virtual .build-deps gcc postgresql-dev python3-dev musl-dev bash \
-    && python -m pip install --upgrade pip \
+RUN python -m pip install --upgrade pip \
     && pip install --no-cache-dir pipenv \
     && pipenv install --system \
-    && apk del --no-cache .build-deps \
     && mkdir -p ./docs/Flake8/
 
 COPY . ./

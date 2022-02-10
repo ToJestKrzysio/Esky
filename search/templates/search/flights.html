@@ -19,5 +19,5 @@
         const data = await response.text()
         resultsRef.innerHTML = data
     }
-    const times = setInterval(getData, 1000)
+    const times = setTimeout(getData, 1000)
 </script>
