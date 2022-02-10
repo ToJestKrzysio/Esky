@@ -28,19 +28,11 @@ class ResultsView(generic.TemplateView):
     form_class = forms.SearchForm
     template_name = 'search/flights.html'
 
-    def get(self, request, *args, **kwargs):
-        form = forms.SearchForm(request.GET)
-        print(request.get_full_path()[1:])
-        if request.GET:
-
-        # GET DATA
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.GET:
-            form = forms.SearchForm(self.request.GET)
-        else:
-            form = forms.SearchForm()
-        context["form"] = form
+        context["form"] = forms.SearchForm(self.request.GET)
         return context
+
+
+class ResultsAjaxView(generic.TemplateView):
+    template_name = 'search/results.html'
