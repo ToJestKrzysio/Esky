@@ -1,31 +1,30 @@
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.wait import WebDriverWait
 
 from bot import helpers
 
-trip_type = 'roundtrip'
-departure_airport_type = "ap"
-arrival_airport_type = "ap"
+service = Service('./bot/drivers/chromedriver')
+service.start()
+options = Options()
+# options.headless = True
+driver = webdriver.Remote(service.service_url, options=options)
+wait = WebDriverWait(driver, 60)
 
-departure = "krk"
-arrival = "lon"
+search_url = helpers.get_search_url()
+driver.get(search_url)
 
-departure_date = "2022-02-26"
-return_date = "2022-03-26"
-
-pax_adult = 1
-pax_young = 0
-pax_children = 0
-pax_infant = 0
-
-flight_standard = "economy"
-
-# url = f"https://www.esky.pl/flights/select/roundtrip/ap/krk/ap/barc?departureDate=2022-02-15&returnDate=2022-02-18&pa=1&py=0&pc=0&pi=0&sc=economy"
-
-url = (f"https://www.esky.pl/flights/select/{trip_type}/{departure_airport_type}/{departure}/"
-       f"{arrival_airport_type}/{arrival}?departureDate={departure_date}&returnDate={return_date}"
-       f"&pa={pax_adult}&py={pax_young}&pc={pax_children}&pi={pax_infant}&sc={flight_standard}")
-
-driver = webdriver.Chrome("./bot/chromedriver")
-driver.get(url)
+progress_bar_selector = helpers.ProgressBarSelector()
+try:
+    wait.until(progress_bar_selector)
+except TimeoutException:
+    pass
 
 helpers.close_cookie_agreement(driver)
+available_flights = helpers.select_available_flights(driver)
+flights_data = helpers.parse_flight(available_flights)
+print(flights_data)
+
+driver.close()
