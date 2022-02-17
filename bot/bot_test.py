@@ -1,3 +1,5 @@
+import pprint as pp
+
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.service import Service
@@ -11,7 +13,7 @@ service.start()
 options = Options()
 # options.headless = True
 driver = webdriver.Remote(service.service_url, options=options)
-wait = WebDriverWait(driver, 60)
+wait = WebDriverWait(driver, 5)
 
 search_url = helpers.get_search_url()
 driver.get(search_url)
@@ -24,7 +26,13 @@ except TimeoutException:
 
 helpers.close_cookie_agreement(driver)
 available_flights = helpers.select_available_flights(driver)
-flights_data = helpers.parse_flight(available_flights)
-print(flights_data)
+flight = available_flights[0]
+flight_data = helpers.FlightDataParser(flight) \
+    .add_price() \
+    .add_airports() \
+    .add_hours() \
+    .add_operators()\
+    .value()
+pp.pprint(flight_data)
 
 driver.close()
